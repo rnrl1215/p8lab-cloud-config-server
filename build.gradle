@@ -2,10 +2,12 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.2'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.bmuschko.docker-remote-api' version '9.4.0'
+	id 'com.bmuschko.docker-java-application' version '9.4.0'
 }
 
 group = 'com.p8labs'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.1'
 
 java {
 	toolchain {
@@ -19,6 +21,21 @@ repositories {
 
 ext {
 	set('springCloudVersion', "2024.0.0")
+}
+
+// 실행 가능한 JAR 생성 설정
+bootJar {
+	enabled = true
+
+	doLast {
+		copy {
+			def jarFile = tasks.bootJar.archiveFile.get().asFile
+			def jarFilePath = jarFile.path
+
+			from jarFilePath
+			into getRootDir().path + "/build/docker/"
+		}
+	}
 }
 
 dependencies {
@@ -36,4 +53,35 @@ dependencyManagement {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+
+
+apply from: 'gradle/docker.gradle'
+
+
+import com.bmuschko.gradle.docker.tasks.image.*
+
+tasks.create('createDockerfile', Dockerfile) {
+	def jarFile = tasks.bootJar.archiveFile.get().asFile
+	from('openjdk:17-jdk-slim')
+	arg("JAR_FILE")
+	copyFile(jarFile.getName(), '/config-app.jar')
+	runCommand("mkdir -p target/dependency && (cd target/dependency; jar -xf /config-app.jar)")
+	entryPoint("java", "-jar", "/config-app.jar")
+	exposePort(8071)
+}
+
+task buildImage(type: DockerBuildImage) {
+	dependsOn createDockerfile
+	images.add('rnrl1215/p8labs-config:latest')
+}
+
+task pushDocker(type: DockerPushImage) {
+	dependsOn buildImage  // Docker 이미지 빌드 후 푸시
+	images.add("rnrl1215/p8labs-config:latest")
+	registryCredentials {
+		username = 'rnrl1215'
+		password = ''
+	}
 }
