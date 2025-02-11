@@ -1,26 +1,29 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://172.20.0.2:3306/cafe
+    username: root
+    password: root
 
-jpa:
-  database: mysql
-  database-platform: org.hibernate.dialect.MySQL8Dialect
-  hibernate:
-    ddl-auto: validate
-  properties:
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      format_sql: true
-      show_sql: true
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
 
-flyway:
-  enabled: true
-  baseline-on-migrate: true
-  baseline-version: 1
-  url: jdbc:mysql://172.20.0.2:3306/cafe
-  user: root
-  password: root
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
+    url: jdbc:mysql://172.20.0.2:3306/cafe
+    user: root
+    password: root
 
 logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.type: trace
-
-example:
-  property: I AM THE DEFAULT
