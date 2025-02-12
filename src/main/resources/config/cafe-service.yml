@@ -1,9 +1,4 @@
 spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://172.20.0.2:3306/cafe
-    username: root
-    password: root
 
 example:
   property: I AM THE DEFAULT

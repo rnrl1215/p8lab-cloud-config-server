@@ -2,13 +2,21 @@ spring:
   application:
     name: config-server
   profiles:
-    active: native #, git, vault
-
+    active:
+    - native #, git, vault
   cloud:
     config:
       server:
-        encrypt.enabled: false
-        native:
-          search-locations: classpath:/config
+        vault:
+          port: 8200
+          host: 127.0.0.1
+          kv-version: 2
+          backend: cafe-service
+          profile-separator: /
+        encrypt:
+          enabled: true
 server:
   port: 8071
+
+encrypt:
+  key: mysecretkey

@@ -3,7 +3,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://172.20.0.2:3306/cafe
     username: root
-    password: root
+    password: {cipher : faca0752f6b8ac9c3c603856d83eab245841aed17542dea183e3a9bbe5ad1237}
 
   jpa:
     database: mysql
@@ -21,7 +21,7 @@ spring:
     baseline-version: 1
     url: jdbc:mysql://172.20.0.2:3306/cafe
     user: root
-    password: root
+    password:  {cipher :faca0752f6b8ac9c3c603856d83eab245841aed17542dea183e3a9bbe5ad1237}
 
 logging:
   level:
