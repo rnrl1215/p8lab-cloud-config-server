@@ -43,6 +43,12 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-config-server'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// Docker
+	// https://mvnrepository.com/artifact/com.bmuschko.docker-remote-api/com.bmuschko.docker-remote-api.gradle.plugin
+	implementation 'com.bmuschko.docker-remote-api:com.bmuschko.docker-remote-api.gradle.plugin:9.4.0'
+// https://mvnrepository.com/artifact/com.bmuschko.docker-java-application/com.bmuschko.docker-java-application.gradle.plugin
+	implementation 'com.bmuschko.docker-java-application:com.bmuschko.docker-java-application.gradle.plugin:9.4.0'
 }
 
 dependencyManagement {
@@ -74,12 +80,12 @@ tasks.create('createDockerfile', Dockerfile) {
 
 task buildImage(type: DockerBuildImage) {
 	dependsOn createDockerfile
-	images.add('rnrl1215/p8labs-config:latest')
+	images.add('rnrl1215/p8labs-config:0.0.2')
 }
 
 task pushDocker(type: DockerPushImage) {
 	dependsOn buildImage  // Docker 이미지 빌드 후 푸시
-	images.add("rnrl1215/p8labs-config:latest")
+	images.add("rnrl1215/p8labs-config:0.0.2")
 	registryCredentials {
 		username = 'rnrl1215'
 		password = ''
