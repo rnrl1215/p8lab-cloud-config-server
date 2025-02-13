@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/cafe
+    url: jdbc:mysql://172.0.0.1:3306/cafe
     username: root
     password: {cipher : faca0752f6b8ac9c3c603856d83eab245841aed17542dea183e3a9bbe5ad1237}
 
@@ -19,7 +19,7 @@ spring:
     enabled: true
     baseline-on-migrate: true
     baseline-version: 1
-    url: jdbc:mysql://localhost:3306/cafe
+    url: jdbc:mysql://172.0.0.1:3306/cafe
     user: root
     password:  {cipher : faca0752f6b8ac9c3c603856d83eab245841aed17542dea183e3a9bbe5ad1237}
 
