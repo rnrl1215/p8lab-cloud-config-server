@@ -1,3 +1,7 @@
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.2'
@@ -27,7 +31,7 @@ ext {
 
 	def isDepoly = project.hasProperty('isDepoly')
 	profile = isDepoly ? project.property("profile") : "${DEFAULT_PROFILE}"
-	serviceVersion = isDepoly ? project.property("buildNumber") : "${SERVICE_VERSION}"
+	serviceVersion = isDepoly ? project.property("serviceVersion") : "${SERVICE_VERSION}"
 	serviceName = isDepoly ? project.property('serviceName') : "${SERVICE_NAME}"
 
 	dockerRepository = isDepoly ? project.property('dockerRepository') : "${DEFAULT_DOCKER_HUB_REPOSITORY}"
@@ -46,13 +50,7 @@ ext {
    	println "[ BUILD INFO ] PROFILE : ${PROFILE}"
 	println "[ BUILD INFO ] Service VERSION : ${SERIVCE_VERSION}"
 	println "[ BUILD INFO ] Service NAME : ${SERVICE_NAME}"
-	println "[ BUILD INFO ] DOCKER USER : ${DOCKER_USER}"
-	println "[ BUILD INFO ] DOCKER PASSWD : ${DOCKER_PASSWORD}"
-
 }
-
-
-apply from: 'gradles/docker.gradle'
 
 
 group = 'com.p8labs'
@@ -91,4 +89,40 @@ dependencyManagement {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+apply from: 'docker.gradle'
+
+tasks.create('createDockerfile', Dockerfile) {
+	def jarFile = tasks.bootJar.archiveFile.get().asFile
+	def path = jarFile.getParent();
+	def jarFileFulPath =  "/"+ "${SERVICE_NAME}"+"-"+"${PROFILE}"+"-"+"${SERIVCE_VERSION}"+'.jar';
+	println "[ CRATE DOCKER FILE INFO ] PATH : ${path}"
+	println "[ CRATE DOCKER FILE INFO ] PROFILE : ${PROFILE}"
+	println "[ CRATE DOCKER FILE INFO ] SERVICE NAME : ${SERVICE_NAME}"
+	println "[ CRATE DOCKER FILE INFO ] SERVICE_VERSION : ${SERIVCE_VERSION}"
+	println "[ CRATE DOCKER FILE INFO ] JAR PATH : ${jarFileFulPath}"
+
+	from('openjdk:17-jdk-slim')
+	arg("JAR_FILE")
+
+	copyFile(jarFileFulPath, '/'+"${SERVICE_NAME}"+'.jar')
+	runCommand("mkdir -p target/dependency && (cd target/dependency; jar -xf /"+"${SERVICE_NAME}"+".jar"+")")
+	entryPoint("java", "-jar", "/"+"${SERVICE_NAME}"+".jar")
+	exposePort(8071)
+}
+
+
+task buildImage(type: DockerBuildImage) {
+	dependsOn createDockerfile
+	images.add("${DOCKER_REPOSITORY}"+"-"+"${PROFILE}"+":"+"${SERIVCE_VERSION}")
+}
+
+task pushDocker(type: DockerPushImage) {
+	dependsOn buildImage  // Docker 이미지 빌드 후 푸시
+	images.add("${DOCKER_REPOSITORY}"+"-"+"${PROFILE}"+":"+"${SERIVCE_VERSION}")
+	registryCredentials {
+		username = "${DOCKER_USER}"
+		password = "${DOCKER_PASSWORD}"
+	}
 }
