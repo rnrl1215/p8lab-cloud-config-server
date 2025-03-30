@@ -1,8 +1,0 @@
-buildscript {
-    repositories {
-        gradlePluginPortal()
-    }
-    dependencies {
-        classpath 'com.bmuschko:gradle-docker-plugin:9.4.0'
-    }
-}
